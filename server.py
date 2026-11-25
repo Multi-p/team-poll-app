@@ -11,9 +11,18 @@ import json
 import uuid
 import re
 import threading
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import urllib.parse
+
+# Indian Standard Time (UTC + 05:30)
+IST = timezone(timedelta(hours=5, minutes=30))
+
+def get_now():
+    return datetime.now(IST)
+
+def get_now_str():
+    return get_now().strftime("%I:%M %p, %d %b")
 
 PORT = 8095
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -21,6 +30,33 @@ STATIC_DIR = os.path.join(APP_DIR, "static")
 DATA_FILE = os.path.join(APP_DIR, "data", "polls.json")
 
 data_lock = threading.Lock()
+
+def is_poll_admin(poll, device_token=None, admin_key=None):
+    if not poll:
+        return False
+    # If explicit admin key matches
+    if admin_key and poll.get("admin_key") and poll.get("admin_key") == admin_key:
+        return True
+    # If device token matches creator
+    if device_token and poll.get("creator_token") and poll.get("creator_token") == device_token:
+        return True
+    # If device token matches any co-admin
+    if device_token:
+        for adm in poll.get("admins", []):
+            if isinstance(adm, dict) and adm.get("device_token") == device_token:
+                return True
+            elif isinstance(adm, str) and adm == device_token:
+                return True
+    return False
+
+def is_poll_creator(poll, device_token=None, admin_key=None):
+    if not poll:
+        return False
+    if admin_key and poll.get("admin_key") and poll.get("admin_key") == admin_key:
+        return True
+    if device_token and poll.get("creator_token") and poll.get("creator_token") == device_token:
+        return True
+    return False
 
 def get_initial_data():
     sample_id = "team-lunch"
@@ -30,7 +66,7 @@ def get_initial_data():
                 "id": sample_id,
                 "question": "🍽️ Are you ready for today's team lunch?",
                 "description": "Please submit your response so we can finalize head count & reservation!",
-                "created_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
+                "created_at": get_now().strftime("%Y-%m-%d %H:%M"),
                 "options": [
                     {"id": "opt-1", "label": "Yes, I'm coming! 🎉", "color": "#10b981"},
                     {"id": "opt-2", "label": "No, can't make it ❌", "color": "#ef4444"},
@@ -121,6 +157,11 @@ class DynamicPollHandler(BaseHTTPRequestHandler):
         path = parsed.path
         query = urllib.parse.parse_qs(parsed.query)
 
+        if path == "/favicon.ico":
+            self.send_response(204)
+            self.end_headers()
+            return
+
         # 1. Routing for Web Pages
         # Home page = Poll Dashboard & Creator
         if path == "/" or path == "/dashboard":
@@ -143,20 +184,54 @@ class DynamicPollHandler(BaseHTTPRequestHandler):
             self.send_json(200, {"status": "ok", "app": "Dynamic Team Poll App"})
             return
 
-        # List all polls
+        # List user's polls (only polls the user created, voted in, or is admin of)
         if path == "/api/polls":
+            device_token = query.get("device_token", [None])[0] or self.headers.get("X-Device-Token")
+            voter_name = query.get("name", [None])[0]
+            poll_ids_param = query.get("poll_ids", [None])[0]
+            known_poll_ids = set(poll_ids_param.split(",")) if poll_ids_param else set()
+
             with data_lock:
                 data = load_data()
                 poll_list = []
                 for pid, p in data.get("polls", {}).items():
-                    poll_list.append({
-                        "id": pid,
-                        "question": p.get("question", "Untitled Poll"),
-                        "description": p.get("description", ""),
-                        "created_at": p.get("created_at", ""),
-                        "options_count": len(p.get("options", [])),
-                        "total_votes": len(p.get("votes", []))
-                    })
+                    role = None
+                    my_choice = None
+
+                    # Check creator
+                    if device_token and p.get("creator_token") == device_token:
+                        role = "creator"
+                    # Check admin
+                    elif device_token and any((a.get("device_token") == device_token if isinstance(a, dict) else a == device_token) for a in p.get("admins", [])):
+                        role = "admin"
+
+                    # Check vote
+                    for v in p.get("votes", []):
+                        if (device_token and v.get("device_token") == device_token) or \
+                           (voter_name and v.get("voter_name", "").strip().lower() == voter_name.strip().lower()):
+                            if not role:
+                                role = "voter"
+                            my_choice = v.get("option_label")
+                            break
+
+                    # Check known poll IDs saved in voter's browser
+                    if not role and pid in known_poll_ids:
+                        role = "participant"
+
+                    # Only show if user is involved
+                    if role:
+                        poll_list.append({
+                            "id": pid,
+                            "question": p.get("question", "Untitled Poll"),
+                            "description": p.get("description", ""),
+                            "created_at": p.get("created_at", ""),
+                            "options_count": len(p.get("options", [])),
+                            "total_votes": len(p.get("votes", [])),
+                            "role": role,
+                            "my_choice": my_choice,
+                            "can_delete": role == "creator"
+                        })
+
                 # Sort newest first
                 poll_list.sort(key=lambda x: x.get("created_at", ""), reverse=True)
                 self.send_json(200, {"polls": poll_list})
@@ -225,6 +300,26 @@ class DynamicPollHandler(BaseHTTPRequestHandler):
                         return
 
                 poll = polls[poll_id]
+
+                # Check admin privileges
+                device_token = query.get("device_token", [None])[0] or self.headers.get("X-Device-Token")
+                admin_key = query.get("admin_key", [None])[0] or query.get("key", [None])[0] or self.headers.get("X-Admin-Key")
+
+                # Auto-initialize legacy polls
+                if "admin_key" not in poll:
+                    poll["admin_key"] = "adm_" + uuid.uuid4().hex[:12]
+                    save_data(data)
+                if not poll.get("creator_token") and device_token:
+                    poll["creator_token"] = device_token
+                    save_data(data)
+
+                is_admin = is_poll_admin(poll, device_token, admin_key)
+
+                co_admin_names = [
+                    (a.get("voter_name") if isinstance(a, dict) else a)
+                    for a in poll.get("admins", [])
+                ]
+
                 votes = poll.get("votes", [])
                 total = len(votes)
 
@@ -280,7 +375,11 @@ class DynamicPollHandler(BaseHTTPRequestHandler):
                     "total_votes": total,
                     "breakdown": breakdown,
                     "recent_votes": sanitized_recent,
-                    "server_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    "options": poll.get("options", []),
+                    "is_admin": is_admin,
+                    "admin_key": poll.get("admin_key") if is_admin else None,
+                    "co_admins": co_admin_names,
+                    "server_time": get_now().strftime("%Y-%m-%d %H:%M:%S")
                 })
             return
 
@@ -323,13 +422,19 @@ class DynamicPollHandler(BaseHTTPRequestHandler):
             short_hash = uuid.uuid4().hex[:6]
             poll_id = f"{slug}-{short_hash}"
 
+            creator_token = (body.get("device_token") or "").strip()
+            admin_key = "adm_" + uuid.uuid4().hex[:12]
+
             new_poll = {
                 "id": poll_id,
                 "question": question,
                 "description": description,
-                "created_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
+                "created_at": get_now().strftime("%Y-%m-%d %H:%M"),
                 "options": options,
-                "votes": []
+                "votes": [],
+                "creator_token": creator_token,
+                "admin_key": admin_key,
+                "admins": []
             }
 
             with data_lock:
@@ -342,6 +447,7 @@ class DynamicPollHandler(BaseHTTPRequestHandler):
                 "id": poll_id,
                 "vote_path": f"/p/{poll_id}",
                 "results_path": f"/r/{poll_id}",
+                "admin_key": admin_key,
                 "message": "Poll created successfully!"
             })
             return
@@ -378,7 +484,7 @@ class DynamicPollHandler(BaseHTTPRequestHandler):
                     return
 
                 votes = poll.get("votes", [])
-                now_str = datetime.now().strftime("%I:%M %p, %d %b")
+                now_str = get_now_str()
 
                 # Upsert by voter name (case-insensitive)
                 existing = None
@@ -427,7 +533,165 @@ class DynamicPollHandler(BaseHTTPRequestHandler):
             })
             return
 
-        # 3. Reset votes for a specific poll
+        # 3. Edit a poll (Question, Description, Options) - Creator & Admins only
+        if path.startswith("/api/poll/") and path.endswith("/edit"):
+            poll_id = path[len("/api/poll/"): -len("/edit")].strip("/")
+            with data_lock:
+                data = load_data()
+                poll = data.get("polls", {}).get(poll_id)
+                if not poll:
+                    self.send_json(404, {"error": "Poll not found"})
+                    return
+
+                device_token = (body.get("device_token") or "").strip() or self.headers.get("X-Device-Token")
+                admin_key = (body.get("admin_key") or body.get("key") or "").strip() or self.headers.get("X-Admin-Key")
+
+                if not is_poll_admin(poll, device_token, admin_key):
+                    self.send_json(403, {"error": "Unauthorized: Only poll creator or co-admins can edit this poll."})
+                    return
+
+                question = (body.get("question") or "").strip()
+                description = (body.get("description") or "").strip()
+                raw_options = body.get("options", [])
+
+                if not question:
+                    self.send_json(400, {"error": "Question is required"})
+                    return
+                if len(raw_options) < 2:
+                    self.send_json(400, {"error": "At least 2 options are required"})
+                    return
+
+                poll["question"] = question
+                poll["description"] = description
+
+                palette = ["#10b981", "#ef4444", "#f59e0b", "#3b82f6", "#8b5cf6", "#ec4899", "#14b8a6", "#f97316"]
+                updated_options = []
+                new_opt_map = {}
+
+                for idx, opt in enumerate(raw_options):
+                    oid = (opt.get("id") if isinstance(opt, dict) else "").strip() or f"opt-{idx+1}"
+                    lbl = (opt.get("label") if isinstance(opt, dict) else str(opt)).strip()
+                    color = opt.get("color") if isinstance(opt, dict) and opt.get("color") else palette[idx % len(palette)]
+                    if lbl:
+                        updated_options.append({
+                            "id": oid,
+                            "label": lbl,
+                            "color": color
+                        })
+                        new_opt_map[oid] = lbl
+
+                poll["options"] = updated_options
+
+                # Update existing votes if their chosen option label was edited
+                for v in poll.get("votes", []):
+                    oid = v.get("option_id")
+                    if oid in new_opt_map:
+                        v["option_label"] = new_opt_map[oid]
+
+                save_data(data)
+
+            self.send_json(200, {"success": True, "message": "Poll updated successfully!"})
+            return
+
+        # 4. Remove an individual vote - Creator & Admins only
+        if path.startswith("/api/poll/") and path.endswith("/vote/remove"):
+            poll_id = path[len("/api/poll/"): -len("/vote/remove")].strip("/")
+            with data_lock:
+                data = load_data()
+                poll = data.get("polls", {}).get(poll_id)
+                if not poll:
+                    self.send_json(404, {"error": "Poll not found"})
+                    return
+
+                device_token = (body.get("device_token") or "").strip() or self.headers.get("X-Device-Token")
+                admin_key = (body.get("admin_key") or body.get("key") or "").strip() or self.headers.get("X-Admin-Key")
+
+                if not is_poll_admin(poll, device_token, admin_key):
+                    self.send_json(403, {"error": "Unauthorized: Only poll creator or co-admins can remove votes."})
+                    return
+
+                voter_name = (body.get("voter_name") or "").strip()
+                if not voter_name:
+                    self.send_json(400, {"error": "Voter name is required"})
+                    return
+
+                poll["votes"] = [
+                    v for v in poll.get("votes", [])
+                    if v.get("voter_name", "").strip().lower() != voter_name.lower()
+                ]
+
+                # Also remove from co-admins if they were an admin
+                poll["admins"] = [
+                    a for a in poll.get("admins", [])
+                    if (a.get("voter_name", "").lower() if isinstance(a, dict) else str(a).lower()) != voter_name.lower()
+                ]
+
+                save_data(data)
+
+            self.send_json(200, {"success": True, "message": f"Vote for '{voter_name}' has been removed."})
+            return
+
+        # 5. Toggle Co-Admin access for someone on the voter list - Creator & Admins only
+        if path.startswith("/api/poll/") and path.endswith("/admins/toggle"):
+            poll_id = path[len("/api/poll/"): -len("/admins/toggle")].strip("/")
+            with data_lock:
+                data = load_data()
+                poll = data.get("polls", {}).get(poll_id)
+                if not poll:
+                    self.send_json(404, {"error": "Poll not found"})
+                    return
+
+                device_token = (body.get("device_token") or "").strip() or self.headers.get("X-Device-Token")
+                admin_key = (body.get("admin_key") or body.get("key") or "").strip() or self.headers.get("X-Admin-Key")
+
+                if not is_poll_admin(poll, device_token, admin_key):
+                    self.send_json(403, {"error": "Unauthorized: Only poll creator or existing admins can manage admin access."})
+                    return
+
+                voter_name = (body.get("voter_name") or "").strip()
+                if not voter_name:
+                    self.send_json(400, {"error": "Voter name is required"})
+                    return
+
+                target_vote = next(
+                    (v for v in poll.get("votes", []) if v.get("voter_name", "").strip().lower() == voter_name.lower()),
+                    None
+                )
+                target_token = target_vote.get("device_token") if target_vote else None
+
+                admins = poll.get("admins", [])
+                already_admin = False
+                for adm in admins:
+                    adm_name = adm.get("voter_name") if isinstance(adm, dict) else adm
+                    if adm_name and adm_name.lower() == voter_name.lower():
+                        already_admin = True
+                        break
+
+                if already_admin:
+                    poll["admins"] = [
+                        a for a in admins
+                        if (a.get("voter_name", "").lower() if isinstance(a, dict) else str(a).lower()) != voter_name.lower()
+                    ]
+                    is_admin_now = False
+                    msg = f"Removed admin access from {voter_name}."
+                else:
+                    poll["admins"].append({
+                        "voter_name": voter_name,
+                        "device_token": target_token
+                    })
+                    is_admin_now = True
+                    msg = f"Granted admin access to {voter_name}!"
+
+                save_data(data)
+
+            self.send_json(200, {
+                "success": True,
+                "is_admin": is_admin_now,
+                "message": msg
+            })
+            return
+
+        # 6. Reset votes for a specific poll
         if path.startswith("/api/poll/") and path.endswith("/reset"):
             poll_id = path[len("/api/poll/"): -len("/reset")].strip("/")
             with data_lock:
@@ -440,23 +704,40 @@ class DynamicPollHandler(BaseHTTPRequestHandler):
             self.send_json(404, {"error": "Poll not found"})
             return
 
-        # 4. Delete a poll
+        # 7. Delete a poll - Creator & Admins only
         if path.startswith("/api/poll/") and path.endswith("/delete"):
             poll_id = path[len("/api/poll/"): -len("/delete")].strip("/")
             with data_lock:
                 data = load_data()
-                if poll_id in data.get("polls", {}):
-                    del data["polls"][poll_id]
-                    save_data(data)
-                    self.send_json(200, {"success": True, "message": "Poll deleted!"})
+                poll = data.get("polls", {}).get(poll_id)
+                if not poll:
+                    self.send_json(404, {"error": "Poll not found"})
                     return
-            self.send_json(404, {"error": "Poll not found"})
-            return
+
+                device_token = (body.get("device_token") or "").strip() or self.headers.get("X-Device-Token")
+                admin_key = (body.get("admin_key") or body.get("key") or "").strip() or self.headers.get("X-Admin-Key")
+
+                if not is_poll_creator(poll, device_token, admin_key):
+                    self.send_json(403, {"error": "Unauthorized: Only poll creator can delete this poll."})
+                    return
+
+                del data["polls"][poll_id]
+                save_data(data)
+                self.send_json(200, {"success": True, "message": "Poll deleted!"})
+                return
 
         self.send_error(404, "Endpoint not found")
 
     def log_message(self, format, *args):
-        sys.stderr.write(f"[{datetime.now().strftime('%H:%M:%S')}] {args[0]} - {args[1]} {args[2]}\n")
+        try:
+            msg = format % args
+        except Exception:
+            msg = " ".join(str(a) for a in args)
+        try:
+            client_ip = self.address_string()
+        except Exception:
+            client_ip = "client"
+        sys.stderr.write(f"[{get_now().strftime('%H:%M:%S')}] {client_ip} - {msg}\n")
 
 def run():
     port = int(os.environ.get("PORT", PORT))

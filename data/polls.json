@@ -23,7 +23,10 @@
           "color": "#f59e0b"
         }
       ],
-      "votes": []
+      "votes": [],
+      "creator_token": "",
+      "admin_key": "",
+      "admins": []
     },
     "what-time-works-best-for-2a2535": {
       "id": "what-time-works-best-for-2a2535",
@@ -55,7 +58,10 @@
           "comment": "Free after 11",
           "voted_at": "04:32 PM, 18 Nov"
         }
-      ]
+      ],
+      "creator_token": "",
+      "admin_key": "",
+      "admins": []
     },
     "today-lunch-ready-c9249e": {
       "id": "today-lunch-ready-c9249e",
@@ -87,7 +93,10 @@
           "comment": "Veg biryani",
           "voted_at": "04:36 PM, 18 Nov"
         }
-      ]
+      ],
+      "creator_token": "",
+      "admin_key": "",
+      "admins": []
     },
     "are-you-ready-for-todays-5e159c": {
       "id": "are-you-ready-for-todays-5e159c",
@@ -126,7 +135,10 @@
           "comment": "",
           "voted_at": "04:47 PM, 18 Nov"
         }
-      ]
+      ],
+      "creator_token": "",
+      "admin_key": "",
+      "admins": []
     },
     "which-team-get-together-d0cff3": {
       "id": "which-team-get-together-d0cff3",
@@ -268,7 +280,183 @@
           "comment": "",
           "voted_at": "06:12 PM, 18 Nov"
         }
-      ]
+      ],
+      "creator_token": "",
+      "admin_key": "",
+      "admins": []
+    },
+    "are-you-ready-for-todays-f7e752": {
+      "id": "are-you-ready-for-todays-f7e752",
+      "question": "🍽️ Are you ready for today's team lunch",
+      "description": "Please confirm by 12:30 PM so we can book the tables!",
+      "created_at": "2026-11-25 15:47",
+      "options": [
+        {
+          "id": "opt-1",
+          "label": "Yes, count me in! 🎉",
+          "color": "#10b981"
+        },
+        {
+          "id": "opt-2",
+          "label": "No, can't make it ❌",
+          "color": "#ef4444"
+        }
+      ],
+      "votes": [
+        {
+          "voter_name": "Rajesh",
+          "option_id": "opt-1",
+          "option_label": "Yes, count me in! 🎉",
+          "comment": "",
+          "voted_at": "03:48 PM, 25 Nov",
+          "device_token": "dt_ure4v0vf8p_mwvyzv2n"
+        }
+      ],
+      "creator_token": "dt_ure4v0vf8p_mwvyzv2n",
+      "admin_key": "adm_35f30016fea1",
+      "admins": []
+    },
+    "which-movie-date-works-b-ce30ab": {
+      "id": "which-movie-date-works-b-ce30ab",
+      "question": "🎬 Which movie & date works best for our team outing?",
+      "description": "We are planning a team movie outing! Please vote for your preferred movie and date so we can book the tickets accordingly.",
+      "created_at": "2026-11-25 09:31",
+      "options": [
+        {
+          "id": "opt-1",
+          "label": "🏹 Ramayanam – This Saturday (Nov 28)",
+          "color": "#10b981"
+        },
+        {
+          "id": "opt-2",
+          "label": "💥 Doomsday – Dec 20, 21, or 22 (Exact date TBD)",
+          "color": "#ef4444"
+        }
+      ],
+      "votes": [
+        {
+          "voter_name": "Ramesh M",
+          "option_id": "opt-2",
+          "option_label": "💥 Doomsday – Dec 20, 21, or 22 (Exact date TBD)",
+          "comment": "",
+          "voted_at": "09:34 AM, 25 Nov"
+        },
+        {
+          "voter_name": "Krishnan N",
+          "option_id": "opt-1",
+          "option_label": "🏹 Ramayanam – This Saturday (Nov 28)",
+          "comment": "3pm to 5 pm",
+          "voted_at": "09:35 AM, 25 Nov"
+        },
+        {
+          "voter_name": "Naveen Kumar V",
+          "option_id": "opt-2",
+          "option_label": "💥 Doomsday – Dec 20, 21, or 22 (Exact date TBD)",
+          "comment": "Om movie (JFF)",
+          "voted_at": "09:37 AM, 25 Nov"
+        },
+        {
+          "voter_name": "Ganesha Moorthi",
+          "option_id": "opt-2",
+          "option_label": "💥 Doomsday – Dec 20, 21, or 22 (Exact date TBD)",
+          "comment": "",
+          "voted_at": "09:56 AM, 25 Nov"
+        },
+        {
+          "voter_name": "Aakash Karthikeyan",
+          "option_id": "opt-2",
+          "option_label": "💥 Doomsday – Dec 20, 21, or 22 (Exact date TBD)",
+          "comment": "",
+          "voted_at": "09:37 AM, 25 Nov"
+        },
+        {
+          "voter_name": "Nishanth S",
+          "option_id": "opt-1",
+          "option_label": "🏹 Ramayanam – This Saturday (Nov 28)",
+          "comment": "",
+          "voted_at": "09:37 AM, 25 Nov"
+        },
+        {
+          "voter_name": "Gayathri Kalimuthu",
+          "option_id": "opt-2",
+          "option_label": "💥 Doomsday – Dec 20, 21, or 22 (Exact date TBD)",
+          "comment": "",
+          "voted_at": "09:45 AM, 25 Nov"
+        },
+        {
+          "voter_name": "Dhilipkumar M",
+          "option_id": "opt-2",
+          "option_label": "💥 Doomsday – Dec 20, 21, or 22 (Exact date TBD)",
+          "comment": "",
+          "voted_at": "09:38 AM, 25 Nov"
+        },
+        {
+          "voter_name": "Eniya R",
+          "option_id": "opt-1",
+          "option_label": "🏹 Ramayanam – This Saturday (Nov 28)",
+          "comment": "",
+          "voted_at": "09:38 AM, 25 Nov"
+        },
+        {
+          "voter_name": "Raja Shankar",
+          "option_id": "opt-1",
+          "option_label": "🏹 Ramayanam – This Saturday (Nov 28)",
+          "comment": "Okay with both",
+          "voted_at": "09:57 AM, 25 Nov"
+        },
+        {
+          "voter_name": "Harshini",
+          "option_id": "opt-2",
+          "option_label": "💥 Doomsday – Dec 20, 21, or 22 (Exact date TBD)",
+          "comment": "",
+          "voted_at": "09:41 AM, 25 Nov"
+        },
+        {
+          "voter_name": "Arun",
+          "option_id": "opt-2",
+          "option_label": "💥 Doomsday – Dec 20, 21, or 22 (Exact date TBD)",
+          "comment": "20th",
+          "voted_at": "09:45 AM, 25 Nov"
+        },
+        {
+          "voter_name": "Kamesh",
+          "option_id": "opt-1",
+          "option_label": "🏹 Ramayanam – This Saturday (Nov 28)",
+          "comment": "",
+          "voted_at": "09:45 AM, 25 Nov"
+        },
+        {
+          "voter_name": "Ajithkumar Palani",
+          "option_id": "opt-2",
+          "option_label": "💥 Doomsday – Dec 20, 21, or 22 (Exact date TBD)",
+          "comment": "",
+          "voted_at": "09:47 AM, 25 Nov"
+        },
+        {
+          "voter_name": "Panneer Selvam A",
+          "option_id": "opt-2",
+          "option_label": "💥 Doomsday – Dec 20, 21, or 22 (Exact date TBD)",
+          "comment": "",
+          "voted_at": "09:47 AM, 25 Nov"
+        },
+        {
+          "voter_name": "Rajesh",
+          "option_id": "opt-2",
+          "option_label": "💥 Doomsday – Dec 20, 21, or 22 (Exact date TBD)",
+          "comment": "",
+          "voted_at": "09:47 AM, 25 Nov"
+        },
+        {
+          "voter_name": "Aravind",
+          "option_id": "opt-2",
+          "option_label": "💥 Doomsday – Dec 20, 21, or 22 (Exact date TBD)",
+          "comment": "",
+          "voted_at": "09:47 AM, 25 Nov"
+        }
+      ],
+      "creator_token": "",
+      "admin_key": "",
+      "admins": []
     }
   }
 }

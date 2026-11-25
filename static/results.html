@@ -273,6 +273,182 @@
       font-weight: 600;
       box-shadow: 0 4px 15px rgba(0,0,0,0.4);
       display: none;
+      z-index: 1000;
+    }
+
+    .admin-bar {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      border-radius: 12px;
+      padding: 12px 18px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .admin-badge {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #fbbf24;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .admin-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-warning {
+      background: #d97706 !important;
+      color: #fff !important;
+      border-color: #b45309 !important;
+    }
+
+    .btn-action {
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-remove {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+    .btn-remove:hover {
+      background: #ef4444;
+      color: #fff;
+    }
+
+    .btn-coadmin {
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+    .btn-coadmin.is-admin {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+    .btn-coadmin:hover {
+      opacity: 0.9;
+    }
+
+    /* Modal styles */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+
+    .modal-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 580px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 12px;
+    }
+
+    .modal-header h3 {
+      font-size: 18px;
+      color: #f8fafc;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .edit-opt-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .edit-opt-row input[type="text"] {
+      flex: 1;
+      padding: 8px 12px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 13.5px;
+    }
+
+    .edit-opt-row button.del-opt-btn {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #f87171;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 24px;
+      border-top: 1px solid #334155;
+      padding-top: 16px;
     }
   </style>
 </head>
@@ -287,6 +463,19 @@
         <a id="votePageLink" href="#" class="btn">🗳️ Vote Page</a>
         <button id="copyTeamsBtn" class="btn btn-primary">📋 Copy for Teams</button>
         <button id="refreshBtn" class="btn">🔄 Refresh</button>
+      </div>
+    </div>
+
+    <!-- Admin Bar (Visible only to Creator & Co-Admins) -->
+    <div id="adminBar" class="admin-bar" style="display:none;">
+      <div class="admin-badge">
+        <span>👑</span>
+        <span>Poll Admin Control</span>
+        <span id="coAdminListBadge" style="font-size: 11px; background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 9999px; color: #fde68a; font-weight: normal; margin-left: 6px;"></span>
+      </div>
+      <div class="admin-actions">
+        <button id="editPollBtn" class="btn btn-warning">✏️ Edit Poll (Question, Dates & Options)</button>
+        <button id="copyAdminLinkBtn" class="btn">🔗 Copy Admin Link</button>
       </div>
     </div>
 
@@ -322,15 +511,49 @@
               <th>Response</th>
               <th>Note / Preference</th>
               <th>Time</th>
+              <th id="thActions" style="display:none;">Admin Actions</th>
             </tr>
           </thead>
           <tbody id="voterTableBody">
             <tr>
-              <td colspan="4" class="empty-state">No responses yet. Share the poll link to collect votes!</td>
+              <td colspan="5" class="empty-state">No responses yet. Share the poll link to collect votes!</td>
             </tr>
           </tbody>
         </table>
       </div>
+    </div>
+  </div>
+
+  <!-- Edit Poll Modal -->
+  <div id="editPollModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>✏️ Edit Poll Details & Options</h3>
+        <button id="closeEditModalBtn" class="close-btn">&times;</button>
+      </div>
+      <form id="editPollForm">
+        <div class="form-group">
+          <label for="editQuestion">Poll Question / Title</label>
+          <input type="text" id="editQuestion" required>
+        </div>
+        <div class="form-group">
+          <label for="editDesc">Description / Note</label>
+          <textarea id="editDesc" rows="2"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Options / Dates (You can change labels, dates, or add more)</label>
+          <div id="editOptionsContainer">
+            <!-- Dynamic edit option rows -->
+          </div>
+          <button type="button" id="modalAddOptBtn" class="btn" style="margin-top: 8px; width: 100%; justify-content: center; background: #0f172a;">
+            ➕ Add Another Option / Date
+          </button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="cancelEditBtn" class="btn">Cancel</button>
+          <button type="submit" id="saveEditBtn" class="btn btn-primary">💾 Save All Changes</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -340,6 +563,20 @@
     let pollId = "";
     let pollData = null;
     let currentFilter = "all";
+
+    function getDeviceToken() {
+      let token = localStorage.getItem("poll_device_token");
+      if (!token) {
+        token = "dt_" + Math.random().toString(36).substring(2, 15) + "_" + Date.now().toString(36);
+        localStorage.setItem("poll_device_token", token);
+      }
+      return token;
+    }
+
+    function getAdminKey() {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get("key") || (pollId ? localStorage.getItem("poll_admin_key_" + pollId) : null);
+    }
 
     // Detect Poll ID from URL
     const path = window.location.pathname;
@@ -352,6 +589,10 @@
       pollId = urlParams.get("id");
     }
 
+    if (urlParams.get("key") && pollId) {
+      localStorage.setItem("poll_admin_key_" + pollId, urlParams.get("key"));
+    }
+
     if (pollId) {
       document.getElementById("votePageLink").href = `/p/${pollId}`;
     } else {
@@ -362,12 +603,21 @@
       const toast = document.getElementById("toast");
       toast.textContent = msg;
       toast.style.display = "block";
-      setTimeout(() => { toast.style.display = "none"; }, 2500);
+      setTimeout(() => { toast.style.display = "none"; }, 2800);
     }
 
     async function fetchResults() {
       try {
-        const apiUrl = pollId ? `/api/results/${pollId}` : `/api/results`;
+        const token = getDeviceToken();
+        const key = getAdminKey();
+        let apiUrl = pollId ? `/api/results/${pollId}` : `/api/results`;
+        const qParams = new URLSearchParams();
+        if (token) qParams.set("device_token", token);
+        if (key) qParams.set("admin_key", key);
+        if (qParams.toString()) {
+          apiUrl += `?${qParams.toString()}`;
+        }
+
         const res = await fetch(apiUrl);
         if (!res.ok) {
           document.getElementById("pollTitle").textContent = "Poll Not Found";
@@ -377,6 +627,11 @@
         pollData = await res.json();
         pollId = pollData.id;
         document.getElementById("votePageLink").href = `/p/${pollId}`;
+
+        if (pollData.is_admin && pollData.admin_key) {
+          localStorage.setItem("poll_admin_key_" + pollId, pollData.admin_key);
+        }
+
         render();
       } catch (err) {
         console.error(err);
@@ -390,6 +645,25 @@
       document.getElementById("pollDesc").textContent = pollData.description || "";
       document.getElementById("totalCount").textContent = pollData.total_votes;
       document.getElementById("lastRefreshed").textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+      // Admin Bar & Table Column
+      const adminBar = document.getElementById("adminBar");
+      const thActions = document.getElementById("thActions");
+      if (pollData.is_admin) {
+        adminBar.style.display = "flex";
+        thActions.style.display = "";
+        const coAdmins = pollData.co_admins || [];
+        const badge = document.getElementById("coAdminListBadge");
+        if (coAdmins.length > 0) {
+          badge.textContent = `Co-Admins: ${coAdmins.join(", ")}`;
+          badge.style.display = "inline-block";
+        } else {
+          badge.style.display = "none";
+        }
+      } else {
+        adminBar.style.display = "none";
+        thActions.style.display = "none";
+      }
 
       // Breakdown Cards
       const breakdownBox = document.getElementById("breakdownContainer");
@@ -447,25 +721,50 @@
     function renderVoterTable() {
       const tbody = document.getElementById("voterTableBody");
       const votes = pollData.recent_votes || [];
+      const isAdmin = pollData.is_admin || false;
+      const coAdmins = (pollData.co_admins || []).map(a => a.toLowerCase());
 
       const filtered = currentFilter === "all" 
         ? votes 
         : votes.filter(v => v.option_id === currentFilter);
 
+      const colSpan = isAdmin ? 5 : 4;
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" class="empty-state">No voters in this category yet.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="${colSpan}" class="empty-state">No voters in this category yet.</td></tr>`;
         return;
       }
 
       tbody.innerHTML = filtered.map(v => {
         const optInfo = (pollData.breakdown || []).find(b => b.id === v.option_id);
         const color = optInfo ? optInfo.color : '#3b82f6';
+        const isThisAdmin = coAdmins.includes(v.voter_name.toLowerCase());
+
+        let actionsHtml = "";
+        if (isAdmin) {
+          actionsHtml = `
+            <td>
+              <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                <button class="btn-action btn-remove" onclick="removeVote('${escapeHtml(v.voter_name)}')">
+                  🗑️ Remove
+                </button>
+                <button class="btn-action btn-coadmin ${isThisAdmin ? 'is-admin' : ''}" onclick="toggleCoAdmin('${escapeHtml(v.voter_name)}')">
+                  ${isThisAdmin ? '👑 Co-Admin ✓' : '➕ Make Co-Admin'}
+                </button>
+              </div>
+            </td>
+          `;
+        }
+
         return `
           <tr>
-            <td><strong>${escapeHtml(v.voter_name)}</strong></td>
+            <td>
+              <strong>${escapeHtml(v.voter_name)}</strong>
+              ${isThisAdmin ? '<span style="margin-left: 6px; font-size: 11px; background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); padding: 1px 6px; border-radius: 9999px;">Admin</span>' : ''}
+            </td>
             <td><span class="badge-choice" style="background: ${color}25; color: ${color}; border: 1px solid ${color}40;">${escapeHtml(v.option_label || v.option_id)}</span></td>
             <td style="color: ${v.comment ? '#f8fafc' : '#64748b'};">${v.comment ? escapeHtml(v.comment) : '—'}</td>
             <td style="color: #64748b; font-size: 13px;">${escapeHtml(v.voted_at || '')}</td>
+            ${actionsHtml}
           </tr>
         `;
       }).join("");
@@ -475,6 +774,182 @@
       if (!str) return "";
       return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
+
+    // Admin Action: Remove Vote
+    async function removeVote(voterName) {
+      if (!confirm(`Are you sure you want to remove the vote submitted by "${voterName}"?`)) return;
+
+      try {
+        const token = getDeviceToken();
+        const key = getAdminKey();
+        const res = await fetch(`/api/poll/${pollId}/vote/remove`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            voter_name: voterName,
+            device_token: token,
+            admin_key: key
+          })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(data.message);
+          fetchResults();
+        } else {
+          showToast(data.error || "Failed to remove vote");
+        }
+      } catch (err) {
+        showToast("Error removing vote");
+      }
+    }
+
+    // Admin Action: Toggle Co-Admin
+    async function toggleCoAdmin(voterName) {
+      try {
+        const token = getDeviceToken();
+        const key = getAdminKey();
+        const res = await fetch(`/api/poll/${pollId}/admins/toggle`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            voter_name: voterName,
+            device_token: token,
+            admin_key: key
+          })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(data.message);
+          fetchResults();
+        } else {
+          showToast(data.error || "Failed to toggle admin status");
+        }
+      } catch (err) {
+        showToast("Error updating admin status");
+      }
+    }
+
+    // Admin Action: Copy Admin Link
+    document.getElementById("copyAdminLinkBtn").addEventListener("click", () => {
+      const key = getAdminKey();
+      if (!key) {
+        showToast("Admin key not found");
+        return;
+      }
+      const adminUrl = `${window.location.origin}/r/${pollId}?key=${encodeURIComponent(key)}`;
+      navigator.clipboard.writeText(adminUrl).then(() => {
+        showToast("Admin link copied! Anyone with this link can manage this poll.");
+      }).catch(() => {
+        showToast("Error copying admin link");
+      });
+    });
+
+    // Edit Poll Modal Handling
+    const editModal = document.getElementById("editPollModal");
+    const editOptionsContainer = document.getElementById("editOptionsContainer");
+
+    document.getElementById("editPollBtn").addEventListener("click", () => {
+      if (!pollData) return;
+      document.getElementById("editQuestion").value = pollData.question || "";
+      document.getElementById("editDesc").value = pollData.description || "";
+
+      editOptionsContainer.innerHTML = "";
+      const currentOpts = pollData.options && pollData.options.length ? pollData.options : (pollData.breakdown || []);
+      currentOpts.forEach(opt => addEditOptionRow(opt.id, opt.label, opt.color));
+
+      editModal.style.display = "flex";
+    });
+
+    document.getElementById("closeEditModalBtn").addEventListener("click", () => {
+      editModal.style.display = "none";
+    });
+    document.getElementById("cancelEditBtn").addEventListener("click", () => {
+      editModal.style.display = "none";
+    });
+
+    function addEditOptionRow(id = "", label = "", color = "") {
+      const row = document.createElement("div");
+      row.className = "edit-opt-row";
+      row.dataset.id = id;
+      row.dataset.color = color || "#3b82f6";
+      row.innerHTML = `
+        <input type="text" value="${escapeHtml(label)}" placeholder="e.g. 21st Nov / Option label" required>
+        <button type="button" class="del-opt-btn" title="Delete Option">✕</button>
+      `;
+
+      row.querySelector(".del-opt-btn").addEventListener("click", () => {
+        if (document.querySelectorAll(".edit-opt-row").length <= 2) {
+          alert("A poll requires at least 2 options.");
+          return;
+        }
+        row.remove();
+      });
+
+      editOptionsContainer.appendChild(row);
+    }
+
+    document.getElementById("modalAddOptBtn").addEventListener("click", () => {
+      addEditOptionRow("", "", "");
+    });
+
+    document.getElementById("editPollForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const question = document.getElementById("editQuestion").value.trim();
+      const description = document.getElementById("editDesc").value.trim();
+
+      const optionRows = document.querySelectorAll(".edit-opt-row");
+      const options = [];
+      optionRows.forEach((row, idx) => {
+        const inp = row.querySelector("input");
+        const val = inp ? inp.value.trim() : "";
+        if (val) {
+          options.push({
+            id: row.dataset.id || `opt-${idx + 1}`,
+            label: val,
+            color: row.dataset.color || "#3b82f6"
+          });
+        }
+      });
+
+      if (options.length < 2) {
+        alert("Please provide at least 2 options.");
+        return;
+      }
+
+      const saveBtn = document.getElementById("saveEditBtn");
+      saveBtn.disabled = true;
+      saveBtn.textContent = "Saving Changes...";
+
+      try {
+        const token = getDeviceToken();
+        const key = getAdminKey();
+        const res = await fetch(`/api/poll/${pollId}/edit`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            question,
+            description,
+            options,
+            device_token: token,
+            admin_key: key
+          })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          showToast(data.message || "Poll updated successfully!");
+          editModal.style.display = "none";
+          fetchResults();
+        } else {
+          alert(data.error || "Update failed");
+        }
+      } catch (err) {
+        alert("Error saving poll updates.");
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "💾 Save All Changes";
+      }
+    });
 
     // Teams Summary Formatter
     document.getElementById("copyTeamsBtn").addEventListener("click", () => {

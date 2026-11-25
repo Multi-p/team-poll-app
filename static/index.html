@@ -306,6 +306,20 @@
     .btn-vote { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border-color: rgba(59, 130, 246, 0.4); }
     .btn-results { background: rgba(16, 185, 129, 0.2); color: #34d399; border-color: rgba(16, 185, 129, 0.4); }
     .btn-del { background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.3); border: none; }
+    .btn-del:hover { background: #ef4444; color: #fff; }
+
+    .badge-role {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      margin-top: 5px;
+    }
+    .badge-creator { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+    .badge-admin { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+    .badge-voted { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .badge-participant { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.3); }
 
     .toast {
       position: fixed;
@@ -421,11 +435,19 @@
       const idx = list.children.length;
       const color = palette[idx % palette.length];
 
+      const defaultPlaceholders = [
+        "Option 1 (e.g. 20th Nov / Yes)",
+        "Option 2 (e.g. 21st Nov / No)",
+        "Option 3 (e.g. 22nd Nov / Maybe)",
+        `Option ${idx + 1}`
+      ];
+      const ph = idx < 3 ? defaultPlaceholders[idx] : `Option ${idx + 1}`;
+
       const row = document.createElement("div");
       row.className = "option-row";
       row.innerHTML = `
         <div class="color-dot" style="background-color: ${color};"></div>
-        <input type="text" class="opt-input" placeholder="Option ${idx + 1}" value="${text.replace(/"/g, '&quot;')}" required>
+        <input type="text" class="opt-input" placeholder="${ph}" value="${text.replace(/"/g, '&quot;')}" required>
         <button type="button" class="btn-remove-opt" title="Remove option">&times;</button>
       `;
 
@@ -438,6 +460,15 @@
       });
 
       list.appendChild(row);
+    }
+
+    function initBlankForm() {
+      document.getElementById("pollQuestion").value = "";
+      document.getElementById("pollDesc").value = "";
+      const list = document.getElementById("optionsList");
+      list.innerHTML = "";
+      addOption("");
+      addOption("");
     }
 
     function applyPreset(type) {
@@ -472,6 +503,15 @@
       }
     }
 
+    function getDeviceToken() {
+      let token = localStorage.getItem("poll_device_token");
+      if (!token) {
+        token = "dt_" + Math.random().toString(36).substring(2, 15) + "_" + Date.now().toString(36);
+        localStorage.setItem("poll_device_token", token);
+      }
+      return token;
+    }
+
     document.getElementById("addOptionBtn").addEventListener("click", () => addOption());
 
     // Create Poll Form Submission
@@ -502,14 +542,18 @@
       btn.textContent = "Creating Poll...";
 
       try {
+        const token = getDeviceToken();
         const res = await fetch("/api/poll/create", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ question, description, options })
+          body: JSON.stringify({ question, description, options, device_token: token })
         });
         const data = await res.json();
 
         if (res.ok) {
+          if (data.admin_key && data.id) {
+            localStorage.setItem("poll_admin_key_" + data.id, data.admin_key);
+          }
           const origin = window.location.origin;
           const voteUrl = `${origin}${data.vote_path}`;
           const resultsUrl = `${origin}${data.results_path}`;
@@ -522,9 +566,18 @@
             navigator.clipboard.writeText(voteUrl).then(() => showToast("Vote link copied for Teams!"));
           };
 
+          try {
+            let myPolls = JSON.parse(localStorage.getItem("my_participated_polls") || "[]");
+            if (data.id && !myPolls.includes(data.id)) {
+              myPolls.push(data.id);
+              localStorage.setItem("my_participated_polls", JSON.stringify(myPolls));
+            }
+          } catch (e) {}
+
           document.getElementById("successModal").style.display = "block";
           window.scrollTo({ top: 0, behavior: 'smooth' });
 
+          initBlankForm();
           loadPollsList();
         } else {
           showToast(data.error || "Failed to create poll");
@@ -537,45 +590,91 @@
       }
     });
 
-    // Load Existing Polls
+    // Load User's Polls (Only polls the user created, voted on, or is admin of)
     async function loadPollsList() {
       const container = document.getElementById("pollsListContainer");
       try {
-        const res = await fetch("/api/polls");
+        const token = getDeviceToken();
+        const savedName = localStorage.getItem("poll_voter_name") || "";
+        let myPolls = [];
+        try {
+          myPolls = JSON.parse(localStorage.getItem("my_participated_polls") || "[]");
+        } catch (e) {}
+
+        const params = new URLSearchParams();
+        if (token) params.set("device_token", token);
+        if (savedName) params.set("name", savedName);
+        if (myPolls.length > 0) params.set("poll_ids", myPolls.join(","));
+
+        const res = await fetch(`/api/polls?${params.toString()}`);
         const data = await res.json();
         const polls = data.polls || [];
 
         if (polls.length === 0) {
-          container.innerHTML = `<p style="color: var(--text-muted); font-size: 14px; text-align: center; padding: 20px;">No polls created yet. Use the form above to create your first poll!</p>`;
+          container.innerHTML = `
+            <div style="text-align: center; padding: 26px 12px; color: var(--text-muted); font-size: 13.5px;">
+              <p style="font-weight: 600; color: #94a3b8;">📭 No polls for your account yet.</p>
+              <p style="font-size: 12.5px; margin-top: 6px; color: #64748b;">
+                Polls you create or vote on will automatically appear here for easy access.
+              </p>
+            </div>
+          `;
           return;
         }
 
-        const origin = window.location.origin;
-        container.innerHTML = polls.map(p => `
-          <div class="poll-item">
-            <div class="poll-item-info">
-              <h4>${escapeHtml(p.question)}</h4>
-              <p>${p.total_votes} response(s) • Created ${escapeHtml(p.created_at || '')}</p>
+        container.innerHTML = polls.map(p => {
+          let roleBadge = "";
+          if (p.role === "creator") {
+            roleBadge = `<span class="badge-role badge-creator">👑 Created by You</span>`;
+          } else if (p.role === "admin") {
+            roleBadge = `<span class="badge-role badge-admin">👑 Co-Admin</span>`;
+          } else if (p.my_choice) {
+            roleBadge = `<span class="badge-role badge-voted">✅ You voted: ${escapeHtml(p.my_choice)}</span>`;
+          } else {
+            roleBadge = `<span class="badge-role badge-participant">🗳️ Participated</span>`;
+          }
+
+          const delButton = p.can_delete ? `<button class="btn-action btn-del" onclick="deletePoll('${p.id}')" title="Delete Poll">🗑️</button>` : ``;
+
+          return `
+            <div class="poll-item">
+              <div class="poll-item-info">
+                <h4>${escapeHtml(p.question)}</h4>
+                <p>${p.total_votes} response(s) • Created ${escapeHtml(p.created_at || '')}</p>
+                <div>${roleBadge}</div>
+              </div>
+              <div class="poll-actions">
+                <a href="/p/${p.id}" class="btn-action btn-vote" target="_blank">🗳️ Vote</a>
+                <a href="/r/${p.id}" class="btn-action btn-results" target="_blank">📊 Results</a>
+                ${delButton}
+              </div>
             </div>
-            <div class="poll-actions">
-              <a href="/p/${p.id}" class="btn-action btn-vote" target="_blank">🗳️ Vote</a>
-              <a href="/r/${p.id}" class="btn-action btn-results" target="_blank">📊 Results</a>
-              <button class="btn-action btn-del" onclick="deletePoll('${p.id}')">🗑️</button>
-            </div>
-          </div>
-        `).join("");
+          `;
+        }).join("");
       } catch (e) {
         container.innerHTML = `<p style="color:#ef4444;">Failed to load polls list.</p>`;
       }
     }
 
     async function deletePoll(id) {
-      if (!confirm("Are you sure you want to delete this poll?")) return;
+      if (!confirm("Are you sure you want to delete this poll? This cannot be undone.")) return;
       try {
-        const res = await fetch(`/api/poll/${id}/delete`, { method: "POST" });
+        const token = getDeviceToken();
+        const adminKey = localStorage.getItem("poll_admin_key_" + id) || "";
+        const res = await fetch(`/api/poll/${id}/delete`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            device_token: token,
+            admin_key: adminKey
+          })
+        });
+        const data = await res.json();
         if (res.ok) {
           showToast("Poll deleted");
           loadPollsList();
+        } else {
+          showToast(data.error || "Failed to delete poll");
         }
       } catch (e) {
         showToast("Error deleting poll");
@@ -589,8 +688,8 @@
 
     document.getElementById("refreshPollsBtn").addEventListener("click", loadPollsList);
 
-    // Initial default
-    applyPreset('lunch');
+    // Initial default: clean empty form with placeholders
+    initBlankForm();
     loadPollsList();
   </script>
 </body>

@@ -448,6 +448,14 @@
 
         const data = await res.json();
         if (res.ok) {
+          try {
+            let myPolls = JSON.parse(localStorage.getItem("my_participated_polls") || "[]");
+            if (pollId && !myPolls.includes(pollId)) {
+              myPolls.push(pollId);
+              localStorage.setItem("my_participated_polls", JSON.stringify(myPolls));
+            }
+          } catch (e) {}
+
           const successBox = document.getElementById("successBox");
           document.getElementById("successDesc").textContent = `${data.message} (${data.choice})`;
           successBox.style.display = "block";
