@@ -1,0 +1,274 @@
+{
+  "active_id": "today-lunch",
+  "polls": {
+    "today-lunch": {
+      "id": "today-lunch",
+      "question": "🍽️ Are you ready for today's team lunch?",
+      "description": "Please let us know so we can book the table and headcount!",
+      "created_at": "2026-11-18 16:21:16",
+      "options": [
+        {
+          "id": "yes",
+          "label": "Yes, count me in! 🎉",
+          "color": "#10b981"
+        },
+        {
+          "id": "no",
+          "label": "No, can't make it ❌",
+          "color": "#ef4444"
+        },
+        {
+          "id": "maybe",
+          "label": "Maybe / Tentative 🤔",
+          "color": "#f59e0b"
+        }
+      ],
+      "votes": []
+    },
+    "what-time-works-best-for-2a2535": {
+      "id": "what-time-works-best-for-2a2535",
+      "question": "⏰ What time works best for daily standup?",
+      "description": "Vote for your preferred sync time slot.",
+      "created_at": "2026-11-18 16:31",
+      "options": [
+        {
+          "id": "opt-1",
+          "label": "11:30 AM",
+          "color": "#10b981"
+        },
+        {
+          "id": "opt-2",
+          "label": "02:30 PM",
+          "color": "#ef4444"
+        },
+        {
+          "id": "opt-3",
+          "label": "04:30 PM",
+          "color": "#f59e0b"
+        }
+      ],
+      "votes": [
+        {
+          "voter_name": "Sarah",
+          "option_id": "opt-1",
+          "option_label": "11:30 AM",
+          "comment": "Free after 11",
+          "voted_at": "04:32 PM, 18 Nov"
+        }
+      ]
+    },
+    "today-lunch-ready-c9249e": {
+      "id": "today-lunch-ready-c9249e",
+      "question": "🍽️ Today Lunch - Ready?",
+      "description": "Please confirm so we can book seats!",
+      "created_at": "2026-11-18 16:36",
+      "options": [
+        {
+          "id": "opt-1",
+          "label": "Yes! Count me in 🎉",
+          "color": "#10b981"
+        },
+        {
+          "id": "opt-2",
+          "label": "No, busy with meetings ❌",
+          "color": "#ef4444"
+        },
+        {
+          "id": "opt-3",
+          "label": "Maybe / Later 🤔",
+          "color": "#f59e0b"
+        }
+      ],
+      "votes": [
+        {
+          "voter_name": "Rajesh",
+          "option_id": "opt-1",
+          "option_label": "Yes! Count me in 🎉",
+          "comment": "Veg biryani",
+          "voted_at": "04:36 PM, 18 Nov"
+        }
+      ]
+    },
+    "are-you-ready-for-todays-5e159c": {
+      "id": "are-you-ready-for-todays-5e159c",
+      "question": "🍽️ Are you ready for today's team lunch?",
+      "description": "Please confirm by 12:30 PM so we can book the tables!",
+      "created_at": "2026-11-18 16:46",
+      "options": [
+        {
+          "id": "opt-1",
+          "label": "Yes, count me in! 🎉",
+          "color": "#10b981"
+        },
+        {
+          "id": "opt-2",
+          "label": "No, can't make it ❌",
+          "color": "#ef4444"
+        },
+        {
+          "id": "opt-3",
+          "label": "Maybe / Tentative 🤔",
+          "color": "#f59e0b"
+        }
+      ],
+      "votes": [
+        {
+          "voter_name": "Aravindan Panneer Selvam",
+          "option_id": "opt-2",
+          "option_label": "No, can't make it ❌",
+          "comment": "",
+          "voted_at": "04:47 PM, 18 Nov"
+        },
+        {
+          "voter_name": "Godwin David",
+          "option_id": "opt-2",
+          "option_label": "No, can't make it ❌",
+          "comment": "",
+          "voted_at": "04:47 PM, 18 Nov"
+        }
+      ]
+    },
+    "which-team-get-together-d0cff3": {
+      "id": "which-team-get-together-d0cff3",
+      "question": "🍽️ Which team get-together would you prefer?",
+      "description": "Please confirm by 12:30 PM so we can book the tables!",
+      "created_at": "2026-11-18 16:49",
+      "options": [
+        {
+          "id": "opt-1",
+          "label": "☀️ Afternoon Team Lunch",
+          "color": "#10b981"
+        },
+        {
+          "id": "opt-2",
+          "label": "🌙 Evening Team Dinner",
+          "color": "#ef4444"
+        },
+        {
+          "id": "opt-3",
+          "label": "🎉 Either works for me!",
+          "color": "#f59e0b"
+        },
+        {
+          "id": "opt-4",
+          "label": "❌ Not available",
+          "color": "#3b82f6"
+        }
+      ],
+      "votes": [
+        {
+          "voter_name": "Aravindan Panneer Selvam",
+          "option_id": "opt-1",
+          "option_label": "☀️ Afternoon Team Lunch",
+          "comment": "",
+          "voted_at": "05:03 PM, 18 Nov"
+        },
+        {
+          "voter_name": "Harshini",
+          "option_id": "opt-1",
+          "option_label": "☀️ Afternoon Team Lunch",
+          "comment": "",
+          "voted_at": "04:51 PM, 18 Nov"
+        },
+        {
+          "voter_name": "Ranjith R",
+          "option_id": "opt-2",
+          "option_label": "🌙 Evening Team Dinner",
+          "comment": "",
+          "voted_at": "04:53 PM, 18 Nov"
+        },
+        {
+          "voter_name": "Naveen Kumar V",
+          "option_id": "opt-4",
+          "option_label": "❌ Not available",
+          "comment": "Not available if this saturday",
+          "voted_at": "04:56 PM, 18 Nov"
+        },
+        {
+          "voter_name": "Raja Shankar",
+          "option_id": "opt-2",
+          "option_label": "🌙 Evening Team Dinner",
+          "comment": "",
+          "voted_at": "06:14 PM, 18 Nov"
+        },
+        {
+          "voter_name": "Nishanth S",
+          "option_id": "opt-4",
+          "option_label": "❌ Not available",
+          "comment": "This week saturday am not available",
+          "voted_at": "05:15 PM, 18 Nov"
+        },
+        {
+          "voter_name": "Gayathri Kalimuthu",
+          "option_id": "opt-3",
+          "option_label": "🎉 Either works for me!",
+          "comment": "",
+          "voted_at": "04:53 PM, 18 Nov"
+        },
+        {
+          "voter_name": "Ganesha Moorthi",
+          "option_id": "opt-2",
+          "option_label": "🌙 Evening Team Dinner",
+          "comment": "",
+          "voted_at": "04:53 PM, 18 Nov"
+        },
+        {
+          "voter_name": "DhilipKumar M",
+          "option_id": "opt-1",
+          "option_label": "☀️ Afternoon Team Lunch",
+          "comment": "",
+          "voted_at": "04:53 PM, 18 Nov"
+        },
+        {
+          "voter_name": "Ramesh M",
+          "option_id": "opt-1",
+          "option_label": "☀️ Afternoon Team Lunch",
+          "comment": "",
+          "voted_at": "04:53 PM, 18 Nov"
+        },
+        {
+          "voter_name": "Kamesh",
+          "option_id": "opt-4",
+          "option_label": "❌ Not available",
+          "comment": "Gpay option Iruka😅",
+          "voted_at": "04:55 PM, 18 Nov"
+        },
+        {
+          "voter_name": "Selvabharathi R",
+          "option_id": "opt-2",
+          "option_label": "🌙 Evening Team Dinner",
+          "comment": "",
+          "voted_at": "06:13 PM, 18 Nov"
+        },
+        {
+          "voter_name": "Ajithkumar",
+          "option_id": "opt-1",
+          "option_label": "☀️ Afternoon Team Lunch",
+          "comment": "",
+          "voted_at": "04:56 PM, 18 Nov"
+        },
+        {
+          "voter_name": "Rajesh",
+          "option_id": "opt-2",
+          "option_label": "🌙 Evening Team Dinner",
+          "comment": "",
+          "voted_at": "06:11 PM, 18 Nov"
+        },
+        {
+          "voter_name": "Eniya R",
+          "option_id": "opt-1",
+          "option_label": "☀️ Afternoon Team Lunch",
+          "comment": "",
+          "voted_at": "06:08 PM, 18 Nov"
+        },
+        {
+          "voter_name": "Nakka Rajesh",
+          "option_id": "opt-2",
+          "option_label": "🌙 Evening Team Dinner",
+          "comment": "",
+          "voted_at": "06:12 PM, 18 Nov"
+        }
+      ]
+    }
+  }
+}

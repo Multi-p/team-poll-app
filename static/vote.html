@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Team Poll</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px 14px;
+      line-height: 1.5;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.5), 0 0 25px rgba(59, 130, 246, 0.1);
+      overflow: hidden;
+      padding: 26px 22px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 8px;
+      line-height: 1.35;
+    }
+
+    p.desc {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 8px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 13px 16px;
+      background: #0f172a;
+      border: 1.5px solid var(--card-border);
+      border-radius: 12px;
+      color: #ffffff;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      background: #0f172a;
+      border: 1.5px solid var(--card-border);
+      border-radius: 12px;
+      color: #e2e8f0;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+    }
+
+    .option-btn:hover {
+      border-color: #475569;
+      background: #172033;
+    }
+
+    .option-btn.selected {
+      border-color: var(--primary);
+      background: rgba(59, 130, 246, 0.12);
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .radio-circle {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #64748b;
+      border-radius: 50%;
+      margin-right: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .option-btn.selected .radio-circle {
+      border-color: var(--primary);
+    }
+
+    .radio-dot {
+      width: 10px;
+      height: 10px;
+      background: var(--primary);
+      border-radius: 50%;
+      display: none;
+    }
+
+    .option-btn.selected .radio-dot {
+      display: block;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary);
+      border: none;
+      border-radius: 12px;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .submit-btn:hover {
+      background: var(--primary-hover);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .success-box {
+      display: none;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      padding: 18px;
+      border-radius: 12px;
+      text-align: center;
+      margin-top: 20px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .success-box h3 {
+      color: #34d399;
+      font-size: 17px;
+      margin-bottom: 6px;
+    }
+
+    .success-box p {
+      color: #a7f3d0;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    .results-link-btn {
+      display: inline-block;
+      padding: 8px 16px;
+      background: #0f172a;
+      color: #38bdf8;
+      border: 1px solid #0284c7;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .footer-links {
+      margin-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .footer-links a {
+      color: #60a5fa;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .status-msg {
+      font-size: 13px;
+      color: #f87171;
+      margin-top: 10px;
+      display: none;
+      text-align: center;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="badge">Team Poll</div>
+      <h1 id="pollQuestion">Loading poll...</h1>
+      <p id="pollDesc" class="desc"></p>
+    </div>
+
+    <div id="previousVoteAlert" style="display:none; background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 10px; padding: 12px 14px; margin-bottom: 18px; font-size: 13.5px; color: #93c5fd; text-align: center;"></div>
+
+    <form id="voteForm">
+      <div class="form-group">
+        <label for="voterName">Your Full Name <span style="color:#f87171;">*</span></label>
+        <input type="text" id="voterName" placeholder="e.g. Rajesh Kumar" required autocomplete="name">
+      </div>
+
+      <div class="form-group">
+        <label>Your Choice <span style="color:#f87171;">*</span></label>
+        <div class="options-grid" id="optionsContainer">
+          <!-- Dynamic Options -->
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="voterComment">Optional Note / Preference</label>
+        <input type="text" id="voterComment" placeholder="e.g. Joining by 1:30 PM / Veg">
+      </div>
+
+      <button type="submit" id="submitBtn" class="submit-btn">
+        <span>Submit My Response</span>
+      </button>
+
+      <div id="statusMsg" class="status-msg"></div>
+    </form>
+
+    <div id="successBox" class="success-box">
+      <h3>🎉 Response Saved!</h3>
+      <p id="successDesc">Thank you, your vote has been recorded.</p>
+      <a id="resultsLinkBtn" href="/results" class="results-link-btn">📊 View Live Poll Results</a>
+    </div>
+
+    <div class="footer-links">
+      <span style="color: #64748b;" id="voteCountBadge">-- responses</span>
+      <a id="footerResultsLink" href="/results">View Live Results →</a>
+    </div>
+  </div>
+
+  <script>
+    let pollId = "";
+    let selectedOptionId = null;
+
+    // Device token for identity protection
+    function getDeviceToken() {
+      let token = localStorage.getItem("poll_device_token");
+      if (!token) {
+        token = "dt_" + Math.random().toString(36).substring(2, 15) + "_" + Date.now().toString(36);
+        localStorage.setItem("poll_device_token", token);
+      }
+      return token;
+    }
+
+    // Detect Poll ID from path (/p/<id> or /poll/<id> or ?id=<id>)
+    const path = window.location.pathname;
+    const urlParams = new URLSearchParams(window.location.search);
+    if (path.startsWith("/p/")) {
+      pollId = path.replace("/p/", "").split("/")[0];
+    } else if (path.startsWith("/poll/")) {
+      pollId = path.replace("/poll/", "").split("/")[0];
+    } else if (urlParams.get("id")) {
+      pollId = urlParams.get("id");
+    }
+
+    // Load saved name
+    const savedName = localStorage.getItem("poll_voter_name");
+    if (savedName) {
+      document.getElementById("voterName").value = savedName;
+    }
+
+    // Set results links
+    const resultsUrl = pollId ? `/r/${pollId}` : "/results";
+    document.getElementById("resultsLinkBtn").href = resultsUrl;
+    document.getElementById("footerResultsLink").href = resultsUrl;
+
+    async function loadPoll() {
+      try {
+        const token = getDeviceToken();
+        const apiUrl = pollId ? `/api/poll/${pollId}?device_token=${encodeURIComponent(token)}` : `/api/poll?device_token=${encodeURIComponent(token)}`;
+        const res = await fetch(apiUrl);
+        if (!res.ok) {
+          document.getElementById("pollQuestion").textContent = "Poll Not Found";
+          document.getElementById("pollDesc").textContent = "The requested poll does not exist or has been deleted.";
+          document.getElementById("voteForm").style.display = "none";
+          return;
+        }
+
+        const data = await res.json();
+        pollId = data.id; // Confirm canonical id
+
+        document.getElementById("pollQuestion").textContent = data.question;
+        document.getElementById("pollDesc").textContent = data.description || "";
+        document.getElementById("voteCountBadge").textContent = `${data.total_votes || 0} response(s)`;
+
+        // If user already voted from this device, prefill selection
+        if (data.my_vote) {
+          if (!document.getElementById("voterName").value && data.my_vote.voter_name) {
+            document.getElementById("voterName").value = data.my_vote.voter_name;
+          }
+          if (data.my_vote.comment) {
+            document.getElementById("voterComment").value = data.my_vote.comment;
+          }
+          selectedOptionId = data.my_vote.option_id;
+          document.getElementById("submitBtn").textContent = "Change / Update Response";
+
+          const prevAlert = document.getElementById("previousVoteAlert");
+          if (prevAlert) {
+            prevAlert.innerHTML = `ℹ️ You previously selected: <strong>${data.my_vote.option_label}</strong>. You can change your response below.`;
+            prevAlert.style.display = "block";
+          }
+        }
+
+        const container = document.getElementById("optionsContainer");
+        container.innerHTML = "";
+
+        data.options.forEach((opt) => {
+          const btn = document.createElement("div");
+          btn.className = "option-btn";
+          if (selectedOptionId && opt.id === selectedOptionId) {
+            btn.classList.add("selected");
+          }
+          btn.dataset.id = opt.id;
+          btn.innerHTML = `
+            <div class="radio-circle">
+              <div class="radio-dot"></div>
+            </div>
+            <span>${opt.label}</span>
+          `;
+
+          btn.addEventListener("click", () => {
+            document.querySelectorAll(".option-btn").forEach(b => b.classList.remove("selected"));
+            btn.classList.add("selected");
+            selectedOptionId = opt.id;
+          });
+
+          container.appendChild(btn);
+        });
+      } catch (err) {
+        document.getElementById("pollQuestion").textContent = "Error loading poll";
+        console.error(err);
+      }
+    }
+
+    document.getElementById("voteForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const statusMsg = document.getElementById("statusMsg");
+      statusMsg.style.display = "none";
+
+      const name = document.getElementById("voterName").value.trim();
+      const comment = document.getElementById("voterComment").value.trim();
+
+      if (!name) {
+        statusMsg.textContent = "Please enter your name.";
+        statusMsg.style.display = "block";
+        return;
+      }
+      if (!selectedOptionId) {
+        statusMsg.textContent = "Please select one of the options.";
+        statusMsg.style.display = "block";
+        return;
+      }
+
+      localStorage.setItem("poll_voter_name", name);
+      const token = getDeviceToken();
+
+      const submitBtn = document.getElementById("submitBtn");
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Saving...";
+
+      try {
+        const res = await fetch("/api/vote", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            poll_id: pollId,
+            name: name,
+            option_id: selectedOptionId,
+            comment: comment,
+            device_token: token
+          })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          const successBox = document.getElementById("successBox");
+          document.getElementById("successDesc").textContent = `${data.message} (${data.choice})`;
+          successBox.style.display = "block";
+          submitBtn.textContent = "Change / Update Response";
+          submitBtn.disabled = false;
+
+          const prevAlert = document.getElementById("previousVoteAlert");
+          if (prevAlert) {
+            prevAlert.innerHTML = `✅ Your current response: <strong>${data.choice}</strong>.`;
+            prevAlert.style.display = "block";
+          }
+        } else {
+          statusMsg.textContent = data.error || "Submission failed";
+          statusMsg.style.display = "block";
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Submit My Response";
+        }
+      } catch (err) {
+        statusMsg.textContent = "Network error. Please try again.";
+        statusMsg.style.display = "block";
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit My Response";
+      }
+    });
+
+    loadPoll();
+  </script>
+</body>
+</html>
